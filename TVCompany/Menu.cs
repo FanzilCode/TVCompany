@@ -133,13 +133,33 @@ namespace TVCompany
         // метод AddAdvertise() - добавление новой записи о рекламе в список
         public static void AddAdvertise()
         {
-            Console.WriteLine("Выберите передачу(введите индекс):");
-            PrintTVShows();
-            int indexTv = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Телепередача\nВыберите: 1) Хочу добавить новую телепередачу\t 2) Выбрать из списка?");
+            int choise = Convert.ToInt32(Console.ReadLine());
+            ITVShow tVShow;
+            if (choise == 1)
+            {
+                tVShow = AddTVShow();
+            }
+            else
+            {
+                Console.WriteLine("Выберите передачу(введите индекс):");
+                PrintTVShows();
+                tVShow = tVShows[Convert.ToInt32(Console.ReadLine())];
+            }
+            Console.WriteLine("Заказчик\nВыберите: 1) Хочу добавить нового заказчика \t 2) Выбрать из списка?");
+            choise = Convert.ToInt32(Console.ReadLine());
+            Customer customer;
+            if (choise == 1)
+            {
+                customer = AddCustomer();
+            }
+            else
+            {
 
-            Console.WriteLine("Выберите заказчика(введите индекс):");
-            PrintCustomers();
-            int indexCs = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Выберите заказчика(введите индекс):");
+                PrintCustomers();
+                customer = customers[Convert.ToInt32(Console.ReadLine())];
+            }
 
             Console.Write("Введите дату рекламы: ");
             DateTime date = Convert.ToDateTime(Console.ReadLine());
@@ -147,14 +167,25 @@ namespace TVCompany
             Console.WriteLine("Введите продолжительность(в минутах) рекламы: ");
             int time = Convert.ToInt32(Console.ReadLine());
 
-            Console.WriteLine("Выберите агента(введите индекс):");
-            PrintAgents();
-            int indexAgent = Convert.ToInt32(Console.ReadLine());
-            advertises.Add(new Advertise(tVShows[indexTv], customers[indexCs], date, time, agents[indexAgent]));
+            Console.WriteLine("Агент\nВыберите: 1) Хочу добавить нового агента \t 2) Выбрать из списка?");
+            choise = Convert.ToInt32(Console.ReadLine());
+            Agent agent;
+
+            if (choise == 1)
+            {
+                agent = AddAgent();
+            }
+            else
+            {
+                Console.WriteLine("Выберите агента(введите индекс):");
+                PrintAgents();
+                agent = agents[Convert.ToInt32(Console.ReadLine())];
+            }
+            advertises.Add(new Advertise(tVShow, customer, date, time, agent));
             PrintAds(DateTime.MinValue, DateTime.MaxValue);
         }
         // метод AddTVShow - добавление новой телепередачи в список
-        public static void AddTVShow()
+        public static ITVShow AddTVShow()
         {
             Console.WriteLine("Выберите тип телепередачи:\n1) Кинофильм;\t2)Новости;\t3)Юмористический");
             int choise = Convert.ToInt32(Console.ReadLine());
@@ -167,11 +198,12 @@ namespace TVCompany
 
             Console.Write("Введите рейтинг(в %): ");
             double rating = Convert.ToDouble(Console.ReadLine());
+            ITVShow tVShow;
             switch(choise)
             {
                 case 1:
                     {
-                        ITVShow tVShow = new Movie(name, minuteCost, rating);
+                        tVShow = new Movie(name, minuteCost, rating);
                         if(tVShows.IndexOf(tVShow) < 0)
                             tVShows.Add(tVShow);
                         else
@@ -180,7 +212,7 @@ namespace TVCompany
                     }
                 case 2:
                     {
-                        ITVShow tVShow = new News(name, minuteCost, rating);
+                        tVShow = new News(name, minuteCost, rating);
 
                         if (tVShows.IndexOf(tVShow) < 0)
                             tVShows.Add(tVShow);
@@ -188,22 +220,21 @@ namespace TVCompany
                             Console.WriteLine("Телепередача уже есть в списке.");
                         break;
                     }
-                case 3:
+                default:
                     {
-                        ITVShow tVShow = new Comic(name, minuteCost, rating);
+                        tVShow = new Comic(name, minuteCost, rating);
                         if (tVShows.IndexOf(tVShow) < 0)
                             tVShows.Add(tVShow);
                         else
                             Console.WriteLine("Телепередача уже есть в списке.");
                         break;
                     }
-                default:
-                    break;
             }
             PrintTVShows();
+            return tVShow;
         }
         // метод AddCustomer() - добавление нового заказчика в список
-        public static void AddCustomer()
+        public static Customer AddCustomer()
         {
             Console.Write("Введите название: ");
             string name = Console.ReadLine();
@@ -225,9 +256,10 @@ namespace TVCompany
             }
             else
                 Console.WriteLine("Заказчик уже есть в списке.");
+            return customer;
         }
         // метод AddAgent() - добавление нового агента в список
-        public static void AddAgent()
+        public static Agent AddAgent()
         {
             Console.Write("Введите полное имя: ");
             string fullname = Console.ReadLine();
@@ -245,6 +277,7 @@ namespace TVCompany
             {
                 Console.WriteLine("Агент уже есть в списке.");
             }
+            return agent;
         }
         // метод AdsOfThePeriod(time1, time2, tVShow) - итоги рекламы по передачам за период с time1 по time2
         public static void AdsOfThePeriod(DateTime time1, DateTime time2, ITVShow tVShow)
